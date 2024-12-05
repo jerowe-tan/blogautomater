@@ -1,7 +1,18 @@
-import { Elysia } from "elysia";
+import {Env} from "bun";
+import { app } from "./app"
+import { Context } from "elysia";
+// interface Env {
+//   KV: Ai
+// }
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+export default {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: Context,
+  ): Promise<Response> {
+    // env.AI
+    return await app.fetch(request)
+  },
+}
