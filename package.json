@@ -4,15 +4,18 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "deploy": "wrangler deploy --minify src/index.ts"
+    "deploy": "wrangler deploy --minify src/index.ts",
+    "wrangler-dev": "wrangler dev src/index.ts",
+    "wrangler-login": "wrangler login"
   },
   "dependencies": {
+    "@elysiajs/bearer": "^1.1.2",
+    "@elysiajs/cors": "^1.1.1",
     "@elysiajs/swagger": "^1.1.6",
     "elysia": "latest",
     "wrangler": "^3.92.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241202.0",
     "bun-types": "latest"
   },
   "module": "src/index.js"
