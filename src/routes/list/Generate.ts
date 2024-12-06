@@ -1,9 +1,9 @@
 import Elysia from "elysia";
-import GenerateBlog from "../../controller/GenerateBlog";
+import {generateBlog} from "../../controller/Blog";
 
 export default new Elysia()
 
-.get("/generate-blog", GenerateBlog , {
+.post("/generate-blog", generateBlog , {
   detail: {
     tags: ['Blog']
   }

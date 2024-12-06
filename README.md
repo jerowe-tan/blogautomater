@@ -19,3 +19,6 @@ https://developers.cloudflare.com/workers/languages/typescript/'
 
 ## To Setup AI
 https://developers.cloudflare.com/workers-ai/get-started/workers-wrangler/
+
+## To Refresh Cloudflare Types
+npx wrangler types --experimental-include-runtime

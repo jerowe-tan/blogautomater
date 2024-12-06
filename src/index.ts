@@ -10,7 +10,7 @@ export default {
   async fetch(
     request: Request,
     env: Env,
-    ctx: Context,
+    ctx:ExecutionContext,
   ): Promise<Response> {
     if (new URL(request.url).pathname === "/favicon.ico") {
       return new Response(null, { status: 204 });
@@ -18,9 +18,8 @@ export default {
 
     app.decorate({
       env,
-      ctx,
     });
 
-    return await app.fetch(request)
+    return await app.handle(request)
   },
 }

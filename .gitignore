@@ -12,6 +12,10 @@
 /.next/
 /out/
 
+#wrangler
+.wrangler
+.dev.vars
+
 # production
 /build
 

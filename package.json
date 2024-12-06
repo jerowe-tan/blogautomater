@@ -13,10 +13,13 @@
     "@elysiajs/cors": "^1.1.1",
     "@elysiajs/swagger": "^1.1.6",
     "elysia": "latest",
+    "jose": "^5.9.6",
+    "mime": "^4.0.4",
     "wrangler": "^3.92.0"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "ts-jose": "^5.9.6"
   },
   "module": "src/index.js"
 }
