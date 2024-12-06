@@ -1,8 +1,6 @@
 import Elysia from "elysia";
 import Swagger from "./docs/Swagger";
 import MainRoutes from "./routes/MainRoutes";
-import cors from "@elysiajs/cors";
-import bearer from "@elysiajs/bearer";
 
 
 export const app = new Elysia({ aot: false })
@@ -20,7 +18,5 @@ export const app = new Elysia({ aot: false })
 .onAfterResponse(() => {
 	console.log('Response', performance.now())
 })
-.use(cors())
-.use(bearer())
 .use(MainRoutes)
 .use(Swagger)
