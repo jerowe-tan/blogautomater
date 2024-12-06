@@ -78,7 +78,9 @@ export class GoogleDrive{
     // Create file metadata
     const metadata = {
       name: fileName, // Name of the file to be created
-      mimeType:MimeName,
+      driveId:this.driveId,
+      mimeType: MimeName,
+      size: file.size,
       parents: [this.driveId], // ID of the shared folder
     };
 
@@ -88,19 +90,21 @@ export class GoogleDrive{
     );
     form.append('file', file, fileName);
     
-    const request = new HttpNativePlate("https://www.googleapis.com/upload/drive/v3")
-    request.path("/files").params({
-      uploadType:"media"
-    }).post().headers({
-      Authorization: `Bearer ${this.loginToken}`,
-      "Content-Type": MimeName,
-    }).data(form)
-    const result = await request.request()
-    if(result.status == 401){
-      mapper.delete("previousGoogleDriveAuthToken")
-      await this.login(true);
-      return await this.store(file, pathName);
-    }
-    return result;
+    return Response.json({message:"true"});
+    // const request = new HttpNativePlate("https://www.googleapis.com/upload/drive/v3")
+    // request.path("/files").params({
+    //   uploadType:"multipart",
+    //   supportsAllDrives:"true",
+    // }).post().headers({
+    //   Authorization: `Bearer ${this.loginToken}`,
+    //   "Content-Type": MimeName,
+    // }).data(form)
+    // const result = await request.request()
+    // if(result.status == 401){
+    //   mapper.delete("previousGoogleDriveAuthToken")
+    //   await this.login(true);
+    //   return await this.store(file, pathName);
+    // }
+    // return result;
   }
 }
