@@ -34,7 +34,7 @@ function checkTitleOfMdFile(mdString:string){
 }
 
 function toFileNameConvention(string:string){
-  return string.toLowerCase().replace(/\s+/g, "-");
+  return string.replaceAll(/[^\w\s-]/g, "").replaceAll(/\s+/g, "-").toLowerCase();
 }
 
 function StringToMDFile(string:string){
