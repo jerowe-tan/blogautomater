@@ -71,7 +71,7 @@ export class GoogleDrive{
     if(!this.loginToken){
       throw new Error("Login Token is not yet created");
     }
-    const form = new FormData();
+
     const fileName =  /[^\\/]+$/.test(pathName) ? (pathName.match(/[^\\/]+$/) as RegExpMatchArray)[0] : "blank.txt";
     const MimeName = mime.getType(fileName) as string;
 
@@ -80,31 +80,42 @@ export class GoogleDrive{
       name: fileName, // Name of the file to be created
       driveId:this.driveId,
       mimeType: MimeName,
-      size: file.size,
       parents: [this.driveId], // ID of the shared folder
     };
 
-    form.append(
-      'metadata',
-      JSON.stringify(metadata),
-    );
-    form.append('file', file, fileName);
+    //Buffer The Blob
+    const arrayBuffer = await file.arrayBuffer();
+    const bufferFile = Buffer.from(arrayBuffer);
+
+    // MULTI PART MAKER
+    const boundary = `boundary-${Date.now()}`;
+    const multipartConstruct = `\r\n--${boundary}
+Content-Type: application/json; charset=UTF-8\r\n
+${JSON.stringify(metadata)}
+--${boundary}
+Content-Type: ${MimeName}\r\n
+${bufferFile}
+--${boundary}--
+`
+    //To get the content length
+    const bufferTheText = Buffer.from(multipartConstruct);
     
-    return Response.json({message:"true"});
-    // const request = new HttpNativePlate("https://www.googleapis.com/upload/drive/v3")
-    // request.path("/files").params({
-    //   uploadType:"multipart",
-    //   supportsAllDrives:"true",
-    // }).post().headers({
-    //   Authorization: `Bearer ${this.loginToken}`,
-    //   "Content-Type": MimeName,
-    // }).data(form)
-    // const result = await request.request()
-    // if(result.status == 401){
-    //   mapper.delete("previousGoogleDriveAuthToken")
-    //   await this.login(true);
-    //   return await this.store(file, pathName);
-    // }
-    // return result;
+    // return Response.json({message:"true"});
+    const request = new HttpNativePlate("https://www.googleapis.com/upload/drive/v3")
+    request.path("/files").params({
+      uploadType:"multipart",
+      supportsAllDrives:"true",
+    }).post().headers({
+      Authorization: `Bearer ${this.loginToken}`,
+      "Content-Type": `multipart/related; boundary=${boundary}`,
+      "Content-Length": `${bufferTheText.length}`,
+    }).data(bufferTheText)
+    const result = await request.request()
+    if(result.status == 401){
+      mapper.delete("previousGoogleDriveAuthToken")
+      await this.login(true);
+      return await this.store(file, pathName);
+    }
+    return result;
   }
 }
