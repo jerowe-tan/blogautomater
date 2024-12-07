@@ -1,13 +1,13 @@
 import { HttpNativePlate } from "../helpers/HttpNative";
 import { DateNavigator, transformDate } from "../helpers/Math";
 import { decryptJWT, generateJWT } from "../helpers/t2/JWT";
-import { requiredFormData } from "../middlewares/Validator";
+import { requiredBody } from "../middlewares/Validator";
 import { MOD_CONTEXT } from "../structure/WebTypes";
-import { aiBlogTextMDGenerator } from "./AiFunctions/Textgeneration/TextGenerationV1";
+import { aiBlogTextMDGenerator, aiBlogTopicGenerator } from "./AiFunctions/Textgeneration/TextGenerationV1";
 import { GoogleDrive } from "./Storage/GoogleDrive";
 
 export async function  generateBlog({env, body}:MOD_CONTEXT<0, {prompt:string}>){
-  if(!requiredFormData(body, ["prompt"])){
+  if(!requiredBody(body, ["prompt"])){
     return Response.json({
       message:"Invalid Form"
     }, {status:422})
@@ -26,6 +26,18 @@ export async function  generateBlog({env, body}:MOD_CONTEXT<0, {prompt:string}>)
   }
   return uploadResult;
 }
+
+
+export async function generateBlogTopic({env, body}:MOD_CONTEXT<0, {message:string}>){
+  if(!requiredBody(body, ["message"])){
+    return Response.json({
+      message:"Invalid Form"
+    }, {status:422})
+  }
+
+  return aiBlogTopicGenerator(env.AI, body.message);
+}
+
 
 function checkTitleOfMdFile(mdString:string){
   const result = [...mdString.matchAll(/^#\s.*$/gm)].map(x=>x[0])[0].replace(/^#\s+/, "");
