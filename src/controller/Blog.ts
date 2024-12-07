@@ -22,7 +22,7 @@ export async function  generateBlog({env, body}:MOD_CONTEXT<0, {prompt:string}>)
   drive.setDriveId("1jjivGwrkJxYvGadrUVvGwV-Ny2VnK6UT");
   const uploadResult = await drive.store(mdFile, fileName);
   if(uploadResult.status == 200){
-    return mdFile;
+    return raw;
   }
   return uploadResult;
 }
