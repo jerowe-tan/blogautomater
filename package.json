@@ -11,7 +11,7 @@
   "dependencies": {
     "@elysiajs/bearer": "^1.1.2",
     "@elysiajs/cors": "^1.1.1",
-    "@elysiajs/swagger": "^1.1.6",
+    "@elysiajs/swagger": "1.1.0",
     "elysia": "latest",
     "jose": "^5.9.6",
     "mime": "^4.0.4",
