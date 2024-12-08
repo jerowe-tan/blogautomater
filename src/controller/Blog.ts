@@ -6,13 +6,13 @@ import { MOD_CONTEXT } from "../structure/WebTypes";
 import { aiBlogTextMDGenerator, aiBlogTopicGenerator } from "./AiFunctions/Textgeneration/TextGenerationV1";
 import { GoogleDrive } from "./Storage/GoogleDrive";
 
-export async function  generateBlog({env, body}:MOD_CONTEXT<0, {prompt:string}>){
-  if(!requiredBody(body, ["prompt"])){
+export async function  generateBlog({env, body}:MOD_CONTEXT<0, {topic:string}>){
+  if(!requiredBody(body, ["topic"])){
     return Response.json({
       message:"Invalid Form"
     }, {status:422})
   }
-  const raw = await aiBlogTextMDGenerator(env.AI , body.prompt);
+  const raw = await aiBlogTextMDGenerator(env.AI , body.topic);
   const mdTitle = checkTitleOfMdFile(raw);
   const mdFile = StringToMDFile(raw);
   const fileName = `blog_${transformDate(Date.now(), "iso")}:-:${toFileNameConvention(mdTitle)}.md`;
@@ -28,14 +28,14 @@ export async function  generateBlog({env, body}:MOD_CONTEXT<0, {prompt:string}>)
 }
 
 
-export async function generateBlogTopic({env, body}:MOD_CONTEXT<0, {message:string}>){
-  if(!requiredBody(body, ["message"])){
+export async function generateBlogTopic({env, body}:MOD_CONTEXT<0, {newsData:string}>){
+  if(!requiredBody(body, ["newsData"])){
     return Response.json({
       message:"Invalid Form"
     }, {status:422})
   }
 
-  return aiBlogTopicGenerator(env.AI, body.message);
+  return aiBlogTopicGenerator(env.AI, body.newsData);
 }
 
 

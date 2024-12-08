@@ -2,17 +2,17 @@ import { BASE64EX_STRING } from "../../../helpers/Cryptographic";
 import masterOfSEO from "../Rules/masterOfSEO";
 import masterOfTopicGenerator from "../Rules/masterOfTopicGenerator";
 
-export async function aiBlogTextMDGenerator(AI:Ai, prompt:BASE64EX_STRING){
+export async function aiBlogTextMDGenerator(AI:Ai, topic:BASE64EX_STRING){
   // const tasks = [];
-  const model = "@cf/meta/llama-3.2-11b-vision-instruct";
+  const model = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 
   const messages = [
     masterOfSEO,
-    { role: "user", content: prompt }
+    { role: "user", content: topic }
   ];
   
   const payload = structuredClone({
-    max_tokens: 768,
+    max_tokens: 2048,
     messages,
     // prompt: "Hello"
   })
@@ -23,12 +23,12 @@ export async function aiBlogTextMDGenerator(AI:Ai, prompt:BASE64EX_STRING){
 }
 
 
-export async function aiBlogTopicGenerator(AI:Ai, prompt:BASE64EX_STRING){
+export async function aiBlogTopicGenerator(AI:Ai, newsData:BASE64EX_STRING){
   // const tasks = [];
-  const model = "@cf/meta/llama-3.2-11b-vision-instruct";
+  const model = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
   const messages = [
     masterOfTopicGenerator,
-    { role: "user", content: prompt }
+    { role: "user", content: newsData }
   ];
   
   const payload = structuredClone({
