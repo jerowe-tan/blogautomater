@@ -3,7 +3,7 @@ import { DateNavigator, transformDate } from "../helpers/Math";
 import { decryptJWT, generateJWT } from "../helpers/t2/JWT";
 import { requiredBody } from "../middlewares/Validator";
 import { MOD_CONTEXT } from "../structure/WebTypes";
-import { aiBlogTextMDGenerator, aiBlogTopicGenerator } from "./AiFunctions/Textgeneration/TextGenerationV1";
+import { aiBlogTextMDGenerator, aiBlogTopicGenerator, aiGenerateKeywords, aiGenerateSummary } from "./AiFunctions/Textgeneration/TextGenerationV1";
 import { GoogleDrive } from "./Storage/GoogleDrive";
 
 export async function  generateBlog({env, body}:MOD_CONTEXT<0, {topic:string}>){
@@ -14,7 +14,10 @@ export async function  generateBlog({env, body}:MOD_CONTEXT<0, {topic:string}>){
   }
   const raw = await aiBlogTextMDGenerator(env.AI , body.topic);
   const mdTitle = checkTitleOfMdFile(raw);
-  const mdFile = StringToMDFile(raw);
+  const mdSummary = await aiGenerateSummary(env.AI, raw);
+  const mdKeywords = await aiGenerateKeywords(env.AI, raw);
+  const modRaw = addMetaDescription(raw, mdTitle, mdSummary, mdKeywords) + raw;
+  const mdFile = StringToMDFile(modRaw);
   const fileName = `blog_${transformDate(Date.now(), "iso")}:-:${toFileNameConvention(mdTitle)}.md`;
 
   const drive = new GoogleDrive(env);
@@ -27,6 +30,17 @@ export async function  generateBlog({env, body}:MOD_CONTEXT<0, {topic:string}>){
   return uploadResult;
 }
 
+function addMetaDescription(raMdString:string, title:string, summary:string, keywords:string){
+  const toAdd =`---
+title: ${title}
+author: ["TMSPH"]
+published: ${transformDate(Date.now(), "yyyy-mm-dd")}
+keywords: [${keywords}]
+type: Blog
+description: ${summary}
+---\n`;
+return toAdd;
+}
 
 export async function generateBlogTopic({env, body}:MOD_CONTEXT<0, {newsData:string}>){
   if(!requiredBody(body, ["newsData"])){

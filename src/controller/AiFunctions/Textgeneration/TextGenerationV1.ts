@@ -1,4 +1,5 @@
 import { BASE64EX_STRING } from "../../../helpers/Cryptographic";
+import masterOfGeneratingKeywords from "../Rules/masterOfGeneratingKeywords";
 import masterOfSEO from "../Rules/masterOfSEO";
 import masterOfTopicGenerator from "../Rules/masterOfTopicGenerator";
 
@@ -40,4 +41,35 @@ export async function aiBlogTopicGenerator(AI:Ai, newsData:BASE64EX_STRING){
   return (response as any).response as string;
   //Sample Only
   // return "Sample";
+}
+
+export async function aiGenerateKeywords(AI:Ai, summary:string){
+  const model = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+  const messages = [
+    masterOfGeneratingKeywords,
+    { role: "user", content: summary }
+  ];
+  const payload = structuredClone({
+    max_tokens: 200,
+    messages,
+    // prompt: "Hello"
+  });
+  const response =  await AI.run(model as any, payload as any);
+  return (response as any).response as string;
+}
+
+
+export async function aiGenerateSummary(AI:Ai, content:string){
+  const model = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+  const messages = [
+    masterOfGeneratingKeywords,
+    { role: "user", content: content }
+  ];
+  const payload = structuredClone({
+    max_tokens: 200,
+    messages,
+    // prompt: "Hello"
+  });
+  const response =  await AI.run(model as any, payload as any);
+  return (response as any).response as string;
 }
