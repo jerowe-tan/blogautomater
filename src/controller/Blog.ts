@@ -32,7 +32,7 @@ export async function  generateBlog({env, body}:MOD_CONTEXT<0, {topic:string}>){
 
 function addMetaDescription(raMdString:string, title:string, summary:string, keywords:string){
   const toAdd =`---
-title: ${title}
+title: "${JSON.stringify(title).slice(1, -1)}"
 author: ["TMSPH"]
 published: ${transformDate(Date.now(), "yyyy-mm-dd")}
 keywords: [${keywords}]
