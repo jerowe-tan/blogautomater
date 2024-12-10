@@ -1,6 +1,7 @@
 import { BASE64EX_STRING } from "../../../helpers/Cryptographic";
 import masterOfGeneratingKeywords from "../Rules/masterOfGeneratingKeywords";
 import masterOfSEO from "../Rules/masterOfSEO";
+import masterOfSummary from "../Rules/masterOfSummary";
 import masterOfTopicGenerator from "../Rules/masterOfTopicGenerator";
 
 export async function aiBlogTextMDGenerator(AI:Ai, topic:BASE64EX_STRING){
@@ -62,7 +63,7 @@ export async function aiGenerateKeywords(AI:Ai, summary:string){
 export async function aiGenerateSummary(AI:Ai, content:string){
   const model = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
   const messages = [
-    masterOfGeneratingKeywords,
+    masterOfSummary,
     { role: "user", content: content }
   ];
   const payload = structuredClone({
