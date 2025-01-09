@@ -9,13 +9,14 @@
     "wrangler-login": "wrangler login"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.33.1",
     "@elysiajs/bearer": "^1.1.2",
     "@elysiajs/cors": "^1.1.1",
     "@elysiajs/swagger": "1.1.0",
     "elysia": "latest",
     "jose": "^5.9.6",
     "mime": "^4.0.4",
-    "wrangler": "^3.92.0"
+    "wrangler": "^3.100.0"
   },
   "devDependencies": {
     "bun-types": "latest",

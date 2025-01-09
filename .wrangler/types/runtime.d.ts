@@ -1,4 +1,4 @@
-// Runtime types generated with workerd@1.20241106.2 2024-07-31 
+// Runtime types generated with workerd@1.20241230.0 2024-07-31 
 /*! *****************************************************************************
 Copyright (c) Cloudflare. All rights reserved.
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -202,7 +202,7 @@ interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
     queueMicrotask(task: Function): void;
     structuredClone<T>(value: T, options?: StructuredSerializeOptions): T;
     reportError(error: any): void;
-    fetch(input: RequestInfo, init?: RequestInit<RequestInitCfProperties>): Promise<Response>;
+    fetch(input: RequestInfo | URL, init?: RequestInit<RequestInitCfProperties>): Promise<Response>;
     self: ServiceWorkerGlobalScope;
     crypto: Crypto;
     caches: CacheStorage;
@@ -308,7 +308,7 @@ declare function structuredClone<T>(value: T, options?: StructuredSerializeOptio
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/reportError) */
 declare function reportError(error: any): void;
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/fetch) */
-declare function fetch(input: RequestInfo, init?: RequestInit<RequestInitCfProperties>): Promise<Response>;
+declare function fetch(input: RequestInfo | URL, init?: RequestInit<RequestInitCfProperties>): Promise<Response>;
 declare const self: ServiceWorkerGlobalScope;
 /**
 * The Web Crypto API provides a set of low-level functions for common cryptographic tasks.
@@ -341,10 +341,12 @@ interface TestController {
 interface ExecutionContext {
     waitUntil(promise: Promise<any>): void;
     passThroughOnException(): void;
+    props: any;
 }
 type ExportedHandlerFetchHandler<Env = unknown, CfHostMetadata = unknown> = (request: Request<CfHostMetadata, IncomingRequestCfProperties<CfHostMetadata>>, env: Env, ctx: ExecutionContext) => Response | Promise<Response>;
 type ExportedHandlerTailHandler<Env = unknown> = (events: TraceItem[], env: Env, ctx: ExecutionContext) => void | Promise<void>;
 type ExportedHandlerTraceHandler<Env = unknown> = (traces: TraceItem[], env: Env, ctx: ExecutionContext) => void | Promise<void>;
+type ExportedHandlerTailStreamHandler<Env = unknown> = (event: TailStream.TailEvent, env: Env, ctx: ExecutionContext) => TailStream.TailEventHandlerType | Promise<TailStream.TailEventHandlerType>;
 type ExportedHandlerScheduledHandler<Env = unknown> = (controller: ScheduledController, env: Env, ctx: ExecutionContext) => void | Promise<void>;
 type ExportedHandlerQueueHandler<Env = unknown, Message = unknown> = (batch: MessageBatch<Message>, env: Env, ctx: ExecutionContext) => void | Promise<void>;
 type ExportedHandlerTestHandler<Env = unknown> = (controller: TestController, env: Env, ctx: ExecutionContext) => void | Promise<void>;
@@ -352,6 +354,7 @@ interface ExportedHandler<Env = unknown, QueueHandlerMessage = unknown, CfHostMe
     fetch?: ExportedHandlerFetchHandler<Env, CfHostMetadata>;
     tail?: ExportedHandlerTailHandler<Env>;
     trace?: ExportedHandlerTraceHandler<Env>;
+    tailStream?: ExportedHandlerTailStreamHandler<Env>;
     scheduled?: ExportedHandlerScheduledHandler<Env>;
     test?: ExportedHandlerTestHandler<Env>;
     email?: EmailExportedHandler<Env>;
@@ -368,7 +371,7 @@ declare abstract class PromiseRejectionEvent extends Event {
     readonly reason: any;
 }
 declare abstract class Navigator {
-    sendBeacon(url: string, body?: (ReadableStream | string | (ArrayBuffer | ArrayBufferView) | Blob | URLSearchParams | FormData)): boolean;
+    sendBeacon(url: string, body?: (ReadableStream | string | (ArrayBuffer | ArrayBufferView) | Blob | FormData | URLSearchParams | URLSearchParams)): boolean;
     readonly userAgent: string;
     readonly gpu: GPU;
 }
@@ -393,7 +396,7 @@ interface Cloudflare {
 }
 interface DurableObject {
     fetch(request: Request): Response | Promise<Response>;
-    alarm?(): void | Promise<void>;
+    alarm?(alarmInfo?: AlarmInvocationInfo): void | Promise<void>;
     webSocketMessage?(ws: WebSocket, message: string | ArrayBuffer): void | Promise<void>;
     webSocketClose?(ws: WebSocket, code: number, reason: string, wasClean: boolean): void | Promise<void>;
     webSocketError?(ws: WebSocket, error: unknown): void | Promise<void>;
@@ -818,11 +821,11 @@ declare abstract class CacheStorage {
 */
 declare abstract class Cache {
     /* [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/#delete) */
-    delete(request: RequestInfo, options?: CacheQueryOptions): Promise<boolean>;
+    delete(request: RequestInfo | URL, options?: CacheQueryOptions): Promise<boolean>;
     /* [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/#match) */
-    match(request: RequestInfo, options?: CacheQueryOptions): Promise<Response | undefined>;
+    match(request: RequestInfo | URL, options?: CacheQueryOptions): Promise<Response | undefined>;
     /* [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/#put) */
-    put(request: RequestInfo, response: Response): Promise<void>;
+    put(request: RequestInfo | URL, response: Response): Promise<void>;
 }
 interface CacheQueryOptions {
     ignoreMethod?: boolean;
@@ -874,7 +877,7 @@ declare abstract class SubtleCrypto {
     /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey) */
     deriveKey(algorithm: string | SubtleCryptoDeriveKeyAlgorithm, baseKey: CryptoKey, derivedKeyAlgorithm: string | SubtleCryptoImportKeyAlgorithm, extractable: boolean, keyUsages: string[]): Promise<CryptoKey>;
     /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits) */
-    deriveBits(algorithm: string | SubtleCryptoDeriveKeyAlgorithm, baseKey: CryptoKey, length?: (number | null)): Promise<ArrayBuffer>;
+    deriveBits(algorithm: string | SubtleCryptoDeriveKeyAlgorithm, baseKey: CryptoKey, length?: number | null): Promise<ArrayBuffer>;
     /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey) */
     importKey(format: string, keyData: (ArrayBuffer | ArrayBufferView) | JsonWebKey, algorithm: string | SubtleCryptoImportKeyAlgorithm, extractable: boolean, keyUsages: string[]): Promise<CryptoKey>;
     /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/exportKey) */
@@ -1304,7 +1307,7 @@ interface ResponseInit {
     webSocket?: (WebSocket | null);
     encodeBody?: "automatic" | "manual";
 }
-type RequestInfo<CfHostMetadata = unknown, Cf = CfProperties<CfHostMetadata>> = Request<CfHostMetadata, Cf> | string | URL;
+type RequestInfo<CfHostMetadata = unknown, Cf = CfProperties<CfHostMetadata>> = Request<CfHostMetadata, Cf> | string;
 /**
  * This Fetch API interface represents a resource request.
  *
@@ -1312,7 +1315,7 @@ type RequestInfo<CfHostMetadata = unknown, Cf = CfProperties<CfHostMetadata>> = 
  */
 declare var Request: {
     prototype: Request;
-    new <CfHostMetadata = unknown, Cf = CfProperties<CfHostMetadata>>(input: RequestInfo<CfProperties>, init?: RequestInit<Cf>): Request<CfHostMetadata, Cf>;
+    new <CfHostMetadata = unknown, Cf = CfProperties<CfHostMetadata>>(input: RequestInfo<CfProperties> | URL, init?: RequestInit<Cf>): Request<CfHostMetadata, Cf>;
 };
 /**
  * This Fetch API interface represents a resource request.
@@ -1385,7 +1388,7 @@ interface RequestInit<Cf = CfProperties> {
 }
 type Service<T extends Rpc.WorkerEntrypointBranded | undefined = undefined> = Fetcher<T>;
 type Fetcher<T extends Rpc.EntrypointBranded | undefined = undefined, Reserved extends string = never> = (T extends Rpc.EntrypointBranded ? Rpc.Provider<T, Reserved | "fetch" | "connect"> : unknown) & {
-    fetch(input: RequestInfo, init?: RequestInit): Promise<Response>;
+    fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
     connect(address: SocketAddress | string, options?: SocketOptions): Socket;
 };
 interface KVNamespaceListKey<Metadata, Key extends string = string> {
@@ -1518,7 +1521,7 @@ declare abstract class R2Bucket {
 interface R2MultipartUpload {
     readonly key: string;
     readonly uploadId: string;
-    uploadPart(partNumber: number, value: ReadableStream | (ArrayBuffer | ArrayBufferView) | string | Blob): Promise<R2UploadedPart>;
+    uploadPart(partNumber: number, value: ReadableStream | (ArrayBuffer | ArrayBufferView) | string | Blob, options?: R2UploadPartOptions): Promise<R2UploadedPart>;
     abort(): Promise<void>;
     complete(uploadedParts: R2UploadedPart[]): Promise<R2Object>;
 }
@@ -1538,6 +1541,7 @@ declare abstract class R2Object {
     readonly customMetadata?: Record<string, string>;
     readonly range?: R2Range;
     readonly storageClass: string;
+    readonly ssecKeyMd5?: string;
     writeHttpMetadata(headers: Headers): void;
 }
 interface R2ObjectBody extends R2Object {
@@ -1567,6 +1571,7 @@ interface R2Conditional {
 interface R2GetOptions {
     onlyIf?: (R2Conditional | Headers);
     range?: (R2Range | Headers);
+    ssecKey?: (ArrayBuffer | string);
 }
 interface R2PutOptions {
     onlyIf?: (R2Conditional | Headers);
@@ -1578,11 +1583,13 @@ interface R2PutOptions {
     sha384?: (ArrayBuffer | string);
     sha512?: (ArrayBuffer | string);
     storageClass?: string;
+    ssecKey?: (ArrayBuffer | string);
 }
 interface R2MultipartOptions {
     httpMetadata?: (R2HTTPMetadata | Headers);
     customMetadata?: Record<string, string>;
     storageClass?: string;
+    ssecKey?: (ArrayBuffer | string);
 }
 interface R2Checksums {
     readonly md5?: ArrayBuffer;
@@ -1616,6 +1623,9 @@ type R2Objects = {
 } | {
     truncated: false;
 });
+interface R2UploadPartOptions {
+    ssecKey?: (ArrayBuffer | string);
+}
 declare abstract class ScheduledEvent extends ExtendableEvent {
     readonly scheduledTime: number;
     readonly cron: string;
@@ -2942,10 +2952,10 @@ declare abstract class BaseAiSentenceSimilarity {
     inputs: AiSentenceSimilarityInput;
     postProcessedOutputs: AiSentenceSimilarityOutput;
 }
-type AiSpeechRecognitionInput = {
+type AiAutomaticSpeechRecognitionInput = {
     audio: number[];
 };
-type AiSpeechRecognitionOutput = {
+type AiAutomaticSpeechRecognitionOutput = {
     text?: string;
     words?: {
         word: string;
@@ -2954,9 +2964,9 @@ type AiSpeechRecognitionOutput = {
     }[];
     vtt?: string;
 };
-declare abstract class BaseAiSpeechRecognition {
-    inputs: AiSpeechRecognitionInput;
-    postProcessedOutputs: AiSpeechRecognitionOutput;
+declare abstract class BaseAiAutomaticSpeechRecognition {
+    inputs: AiAutomaticSpeechRecognitionInput;
+    postProcessedOutputs: AiAutomaticSpeechRecognitionOutput;
 }
 type AiSummarizationInput = {
     input_text: string;
@@ -2992,16 +3002,31 @@ declare abstract class BaseAiTextEmbeddings {
     postProcessedOutputs: AiTextEmbeddingsOutput;
 }
 type RoleScopedChatInput = {
-    role: "user" | "assistant" | "system" | "tool";
+    role: "user" | "assistant" | "system" | "tool" | (string & NonNullable<unknown>);
     content: string;
+    name?: string;
+};
+type AiTextGenerationToolLegacyInput = {
+    name: string;
+    description: string;
+    parameters?: {
+        type: "object" | (string & NonNullable<unknown>);
+        properties: {
+            [key: string]: {
+                type: string;
+                description?: string;
+            };
+        };
+        required: string[];
+    };
 };
 type AiTextGenerationToolInput = {
-    type: "function";
+    type: "function" | (string & NonNullable<unknown>);
     function: {
         name: string;
         description: string;
         parameters?: {
-            type: "object";
+            type: "object" | (string & NonNullable<unknown>);
             properties: {
                 [key: string]: {
                     type: string;
@@ -3011,6 +3036,10 @@ type AiTextGenerationToolInput = {
             required: string[];
         };
     };
+};
+type AiTextGenerationFunctionsInput = {
+    name: string;
+    code: string;
 };
 type AiTextGenerationInput = {
     prompt?: string;
@@ -3025,7 +3054,8 @@ type AiTextGenerationInput = {
     frequency_penalty?: number;
     presence_penalty?: number;
     messages?: RoleScopedChatInput[];
-    tools?: AiTextGenerationToolInput[];
+    tools?: AiTextGenerationToolInput[] | AiTextGenerationToolLegacyInput[];
+    functions?: AiTextGenerationFunctionsInput[];
 };
 type AiTextGenerationOutput = {
     response?: string;
@@ -3038,13 +3068,29 @@ declare abstract class BaseAiTextGeneration {
     inputs: AiTextGenerationInput;
     postProcessedOutputs: AiTextGenerationOutput;
 }
+type AiTextToSpeechInput = {
+    prompt: string;
+    lang?: string;
+};
+type AiTextToSpeechOutput = Uint8Array | {
+    audio: string;
+};
+declare abstract class BaseAiTextToSpeech {
+    inputs: AiTextToSpeechInput;
+    postProcessedOutputs: AiTextToSpeechOutput;
+}
 type AiTextToImageInput = {
     prompt: string;
+    negative_prompt?: string;
+    height?: number;
+    width?: number;
     image?: number[];
+    image_b64?: string;
     mask?: number[];
     num_steps?: number;
     strength?: number;
     guidance?: number;
+    seed?: number;
 };
 type AiTextToImageOutput = ReadableStream<Uint8Array>;
 declare abstract class BaseAiTextToImage {
@@ -3063,6 +3109,75 @@ declare abstract class BaseAiTranslation {
     inputs: AiTranslationInput;
     postProcessedOutputs: AiTranslationOutput;
 }
+type AiOptions = {
+    gateway?: GatewayOptions;
+    prefix?: string;
+    extraHeaders?: object;
+};
+type ModelType<Name extends keyof AiModels> = AiModels[Name];
+interface AiModels {
+    "@cf/huggingface/distilbert-sst-2-int8": BaseAiTextClassification;
+    "@cf/stabilityai/stable-diffusion-xl-base-1.0": BaseAiTextToImage;
+    "@cf/runwayml/stable-diffusion-v1-5-inpainting": BaseAiTextToImage;
+    "@cf/runwayml/stable-diffusion-v1-5-img2img": BaseAiTextToImage;
+    "@cf/lykon/dreamshaper-8-lcm": BaseAiTextToImage;
+    "@cf/bytedance/stable-diffusion-xl-lightning": BaseAiTextToImage;
+    "@cf/baai/bge-base-en-v1.5": BaseAiTextEmbeddings;
+    "@cf/baai/bge-small-en-v1.5": BaseAiTextEmbeddings;
+    "@cf/baai/bge-large-en-v1.5": BaseAiTextEmbeddings;
+    "@cf/microsoft/resnet-50": BaseAiImageClassification;
+    "@cf/facebook/detr-resnet-50": BaseAiObjectDetection;
+    "@cf/meta/llama-2-7b-chat-int8": BaseAiTextGeneration;
+    "@cf/mistral/mistral-7b-instruct-v0.1": BaseAiTextGeneration;
+    "@cf/meta/llama-2-7b-chat-fp16": BaseAiTextGeneration;
+    "@hf/thebloke/llama-2-13b-chat-awq": BaseAiTextGeneration;
+    "@hf/thebloke/mistral-7b-instruct-v0.1-awq": BaseAiTextGeneration;
+    "@hf/thebloke/zephyr-7b-beta-awq": BaseAiTextGeneration;
+    "@hf/thebloke/openhermes-2.5-mistral-7b-awq": BaseAiTextGeneration;
+    "@hf/thebloke/neural-chat-7b-v3-1-awq": BaseAiTextGeneration;
+    "@hf/thebloke/llamaguard-7b-awq": BaseAiTextGeneration;
+    "@hf/thebloke/deepseek-coder-6.7b-base-awq": BaseAiTextGeneration;
+    "@hf/thebloke/deepseek-coder-6.7b-instruct-awq": BaseAiTextGeneration;
+    "@cf/deepseek-ai/deepseek-math-7b-instruct": BaseAiTextGeneration;
+    "@cf/defog/sqlcoder-7b-2": BaseAiTextGeneration;
+    "@cf/openchat/openchat-3.5-0106": BaseAiTextGeneration;
+    "@cf/tiiuae/falcon-7b-instruct": BaseAiTextGeneration;
+    "@cf/thebloke/discolm-german-7b-v1-awq": BaseAiTextGeneration;
+    "@cf/qwen/qwen1.5-0.5b-chat": BaseAiTextGeneration;
+    "@cf/qwen/qwen1.5-7b-chat-awq": BaseAiTextGeneration;
+    "@cf/qwen/qwen1.5-14b-chat-awq": BaseAiTextGeneration;
+    "@cf/tinyllama/tinyllama-1.1b-chat-v1.0": BaseAiTextGeneration;
+    "@cf/microsoft/phi-2": BaseAiTextGeneration;
+    "@cf/qwen/qwen1.5-1.8b-chat": BaseAiTextGeneration;
+    "@cf/mistral/mistral-7b-instruct-v0.2-lora": BaseAiTextGeneration;
+    "@hf/nousresearch/hermes-2-pro-mistral-7b": BaseAiTextGeneration;
+    "@hf/nexusflow/starling-lm-7b-beta": BaseAiTextGeneration;
+    "@hf/google/gemma-7b-it": BaseAiTextGeneration;
+    "@cf/meta-llama/llama-2-7b-chat-hf-lora": BaseAiTextGeneration;
+    "@cf/google/gemma-2b-it-lora": BaseAiTextGeneration;
+    "@cf/google/gemma-7b-it-lora": BaseAiTextGeneration;
+    "@hf/mistral/mistral-7b-instruct-v0.2": BaseAiTextGeneration;
+    "@cf/meta/llama-3-8b-instruct": BaseAiTextGeneration;
+    "@cf/fblgit/una-cybertron-7b-v2-bf16": BaseAiTextGeneration;
+    "@cf/meta/llama-3-8b-instruct-awq": BaseAiTextGeneration;
+    "@hf/meta-llama/meta-llama-3-8b-instruct": BaseAiTextGeneration;
+    "@cf/meta/llama-3.1-8b-instruct": BaseAiTextGeneration;
+    "@cf/meta/llama-3.1-8b-instruct-fp8": BaseAiTextGeneration;
+    "@cf/meta/llama-3.1-8b-instruct-awq": BaseAiTextGeneration;
+    "@cf/meta/llama-3.2-3b-instruct": BaseAiTextGeneration;
+    "@cf/meta/llama-3.2-1b-instruct": BaseAiTextGeneration;
+    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": BaseAiTextGeneration;
+    "@cf/meta/m2m100-1.2b": BaseAiTranslation;
+    "@cf/facebook/bart-large-cnn": BaseAiSummarization;
+    "@cf/unum/uform-gen2-qwen-500m": BaseAiImageToText;
+    "@cf/llava-hf/llava-1.5-7b-hf": BaseAiImageToText;
+}
+type ModelListType = Record<string, any>;
+declare abstract class Ai<ModelList extends ModelListType = AiModels> {
+    aiGatewayLogId: string | null;
+    gateway(gatewayId: string): AiGateway;
+    run<Name extends keyof ModelList>(model: Name, inputs: ModelList[Name]["inputs"], options?: AiOptions): Promise<ModelList[Name]["postProcessedOutputs"]>;
+}
 type GatewayOptions = {
     id: string;
     cacheKey?: string;
@@ -3071,32 +3186,69 @@ type GatewayOptions = {
     metadata?: Record<string, number | string | boolean | null | bigint>;
     collectLog?: boolean;
 };
-type AiOptions = {
-    gateway?: GatewayOptions;
-    prefix?: string;
-    extraHeaders?: object;
+type AiGatewayPatchLog = {
+    score?: number | null;
+    feedback?: -1 | 1 | null;
+    metadata?: Record<string, number | string | boolean | null | bigint> | null;
 };
-type BaseAiTextClassificationModels = "@cf/huggingface/distilbert-sst-2-int8";
-type BaseAiTextToImageModels = "@cf/stabilityai/stable-diffusion-xl-base-1.0" | "@cf/runwayml/stable-diffusion-v1-5-inpainting" | "@cf/runwayml/stable-diffusion-v1-5-img2img" | "@cf/lykon/dreamshaper-8-lcm" | "@cf/bytedance/stable-diffusion-xl-lightning";
-type BaseAiTextEmbeddingsModels = "@cf/baai/bge-small-en-v1.5" | "@cf/baai/bge-base-en-v1.5" | "@cf/baai/bge-large-en-v1.5";
-type BaseAiSpeechRecognitionModels = "@cf/openai/whisper" | "@cf/openai/whisper-tiny-en" | "@cf/openai/whisper-sherpa";
-type BaseAiImageClassificationModels = "@cf/microsoft/resnet-50";
-type BaseAiObjectDetectionModels = "@cf/facebook/detr-resnet-50";
-type BaseAiTextGenerationModels = "@cf/meta/llama-3.1-8b-instruct" | "@cf/meta/llama-3-8b-instruct" | "@cf/meta/llama-3-8b-instruct-awq" | "@cf/meta/llama-2-7b-chat-int8" | "@cf/mistral/mistral-7b-instruct-v0.1" | "@cf/mistral/mistral-7b-instruct-v0.2-lora" | "@cf/meta/llama-2-7b-chat-fp16" | "@hf/thebloke/llama-2-13b-chat-awq" | "@hf/thebloke/zephyr-7b-beta-awq" | "@hf/thebloke/mistral-7b-instruct-v0.1-awq" | "@hf/thebloke/codellama-7b-instruct-awq" | "@hf/thebloke/openhermes-2.5-mistral-7b-awq" | "@hf/thebloke/neural-chat-7b-v3-1-awq" | "@hf/thebloke/llamaguard-7b-awq" | "@hf/thebloke/deepseek-coder-6.7b-base-awq" | "@hf/thebloke/deepseek-coder-6.7b-instruct-awq" | "@hf/nousresearch/hermes-2-pro-mistral-7b" | "@hf/mistral/mistral-7b-instruct-v0.2" | "@hf/google/gemma-7b-it" | "@hf/nexusflow/starling-lm-7b-beta" | "@cf/deepseek-ai/deepseek-math-7b-instruct" | "@cf/defog/sqlcoder-7b-2" | "@cf/openchat/openchat-3.5-0106" | "@cf/tiiuae/falcon-7b-instruct" | "@cf/thebloke/discolm-german-7b-v1-awq" | "@cf/qwen/qwen1.5-0.5b-chat" | "@cf/qwen/qwen1.5-1.8b-chat" | "@cf/qwen/qwen1.5-7b-chat-awq" | "@cf/qwen/qwen1.5-14b-chat-awq" | "@cf/tinyllama/tinyllama-1.1b-chat-v1.0" | "@cf/microsoft/phi-2" | "@cf/google/gemma-2b-it-lora" | "@cf/google/gemma-7b-it-lora" | "@cf/meta-llama/llama-2-7b-chat-hf-lora" | "@cf/fblgit/una-cybertron-7b-v2-bf16" | "@cf/fblgit/una-cybertron-7b-v2-awq";
-type BaseAiTranslationModels = "@cf/meta/m2m100-1.2b";
-type BaseAiSummarizationModels = "@cf/facebook/bart-large-cnn";
-type BaseAiImageToTextModels = "@cf/unum/uform-gen2-qwen-500m" | "@cf/llava-hf/llava-1.5-7b-hf";
-declare abstract class Ai {
-    run(model: BaseAiTextClassificationModels, inputs: BaseAiTextClassification["inputs"], options?: AiOptions): Promise<BaseAiTextClassification["postProcessedOutputs"]>;
-    run(model: BaseAiTextToImageModels, inputs: BaseAiTextToImage["inputs"], options?: AiOptions): Promise<BaseAiTextToImage["postProcessedOutputs"]>;
-    run(model: BaseAiTextEmbeddingsModels, inputs: BaseAiTextEmbeddings["inputs"], options?: AiOptions): Promise<BaseAiTextEmbeddings["postProcessedOutputs"]>;
-    run(model: BaseAiSpeechRecognitionModels, inputs: BaseAiSpeechRecognition["inputs"], options?: AiOptions): Promise<BaseAiSpeechRecognition["postProcessedOutputs"]>;
-    run(model: BaseAiImageClassificationModels, inputs: BaseAiImageClassification["inputs"], options?: AiOptions): Promise<BaseAiImageClassification["postProcessedOutputs"]>;
-    run(model: BaseAiObjectDetectionModels, inputs: BaseAiObjectDetection["inputs"], options?: AiOptions): Promise<BaseAiObjectDetection["postProcessedOutputs"]>;
-    run(model: BaseAiTextGenerationModels, inputs: BaseAiTextGeneration["inputs"], options?: AiOptions): Promise<BaseAiTextGeneration["postProcessedOutputs"]>;
-    run(model: BaseAiTranslationModels, inputs: BaseAiTranslation["inputs"], options?: AiOptions): Promise<BaseAiTranslation["postProcessedOutputs"]>;
-    run(model: BaseAiSummarizationModels, inputs: BaseAiSummarization["inputs"], options?: AiOptions): Promise<BaseAiSummarization["postProcessedOutputs"]>;
-    run(model: BaseAiImageToTextModels, inputs: BaseAiImageToText["inputs"], options?: AiOptions): Promise<BaseAiImageToText["postProcessedOutputs"]>;
+type AiGatewayLog = {
+    id: string;
+    provider: string;
+    model: string;
+    model_type?: string;
+    path: string;
+    duration: number;
+    request_type?: string;
+    request_content_type?: string;
+    status_code: number;
+    response_content_type?: string;
+    success: boolean;
+    cached: boolean;
+    tokens_in?: number;
+    tokens_out?: number;
+    metadata?: Record<string, number | string | boolean | null | bigint>;
+    step?: number;
+    cost?: number;
+    custom_cost?: boolean;
+    request_size: number;
+    request_head?: string;
+    request_head_complete: boolean;
+    response_size: number;
+    response_head?: string;
+    response_head_complete: boolean;
+    created_at: Date;
+};
+type AIGatewayProviders = 'workers-ai' | 'anthropic' | 'aws-bedrock' | 'azure-openai' | 'google-vertex-ai' | 'huggingface' | 'openai' | 'perplexity-ai' | 'replicate' | 'groq' | 'cohere' | 'google-ai-studio' | 'mistral' | 'grok' | 'openrouter';
+type AIGatewayHeaders = {
+    'cf-aig-metadata': Record<string, number | string | boolean | null | bigint> | string;
+    'cf-aig-custom-cost': {
+        per_token_in?: number;
+        per_token_out?: number;
+    } | {
+        total_cost?: number;
+    } | string;
+    'cf-aig-cache-ttl': number | string;
+    'cf-aig-skip-cache': boolean | string;
+    'cf-aig-cache-key': string;
+    'cf-aig-collect-log': boolean | string;
+    Authorization: string;
+    'Content-Type': string;
+    [key: string]: string | number | boolean | object;
+};
+type AIGatewayUniversalRequest = {
+    provider: AIGatewayProviders | string; // eslint-disable-line
+    endpoint: string;
+    headers: Partial<AIGatewayHeaders>;
+    query: unknown;
+};
+interface AiGatewayInternalError extends Error {
+}
+interface AiGatewayLogNotFound extends Error {
+}
+declare abstract class AiGateway {
+    patchLog(logId: string, data: AiGatewayPatchLog): Promise<void>;
+    getLog(logId: string): Promise<AiGatewayLog>;
+    run(data: AIGatewayUniversalRequest | AIGatewayUniversalRequest[]): Promise<Response>;
 }
 interface BasicImageTransformations {
     /**
@@ -4295,25 +4447,28 @@ declare module "cloudflare:workers" {
         protected env: Env;
         constructor(ctx: DurableObjectState, env: Env);
         fetch?(request: Request): Response | Promise<Response>;
-        alarm?(): void | Promise<void>;
+        alarm?(alarmInfo?: AlarmInvocationInfo): void | Promise<void>;
         webSocketMessage?(ws: WebSocket, message: string | ArrayBuffer): void | Promise<void>;
         webSocketClose?(ws: WebSocket, code: number, reason: string, wasClean: boolean): void | Promise<void>;
         webSocketError?(ws: WebSocket, error: unknown): void | Promise<void>;
     }
     export type WorkflowDurationLabel = "second" | "minute" | "hour" | "day" | "week" | "month" | "year";
     export type WorkflowSleepDuration = `${number} ${WorkflowDurationLabel}${"s" | ""}` | number;
+    export type WorkflowDelayDuration = WorkflowSleepDuration;
+    export type WorkflowTimeoutDuration = WorkflowSleepDuration;
     export type WorkflowBackoff = "constant" | "linear" | "exponential";
     export type WorkflowStepConfig = {
         retries?: {
             limit: number;
-            delay: string | number;
+            delay: WorkflowDelayDuration | number;
             backoff?: WorkflowBackoff;
         };
-        timeout?: string | number;
+        timeout?: WorkflowTimeoutDuration | number;
     };
     export type WorkflowEvent<T> = {
         payload: Readonly<T>;
         timestamp: Date;
+        instanceId: string;
     };
     export abstract class WorkflowStep {
         do<T extends Rpc.Serializable<T>>(name: string, callback: () => Promise<T>): Promise<T>;
@@ -4331,6 +4486,157 @@ declare module "cloudflare:workers" {
 declare module "cloudflare:sockets" {
     function _connect(address: string | SocketAddress, options?: SocketOptions): Socket;
     export { _connect as connect };
+}
+declare namespace TailStream {
+    interface Header {
+        readonly name: string;
+        readonly value: string;
+    }
+    interface FetchEventInfo {
+        readonly type: "fetch";
+        readonly method: string;
+        readonly url: string;
+        readonly cfJson: string;
+        readonly headers: Header[];
+    }
+    interface JsRpcEventInfo {
+        readonly type: "jsrpc";
+        readonly methodName: string;
+    }
+    interface ScheduledEventInfo {
+        readonly type: "scheduled";
+        readonly scheduledTime: Date;
+        readonly cron: string;
+    }
+    interface AlarmEventInfo {
+        readonly type: "alarm";
+        readonly scheduledTime: Date;
+    }
+    interface QueueEventInfo {
+        readonly type: "queue";
+        readonly queueName: string;
+        readonly batchSize: number;
+    }
+    interface EmailEventInfo {
+        readonly type: "email";
+        readonly mailFrom: string;
+        readonly rcptTo: string;
+        readonly rawSize: number;
+    }
+    interface TraceEventInfo {
+        readonly type: "trace";
+        readonly traces: (string | null)[];
+    }
+    interface HibernatableWebSocketEventInfoMessage {
+        readonly type: "message";
+    }
+    interface HibernatableWebSocketEventInfoError {
+        readonly type: "error";
+    }
+    interface HibernatableWebSocketEventInfoClose {
+        readonly type: "close";
+        readonly code: number;
+        readonly wasClean: boolean;
+    }
+    interface HibernatableWebSocketEventInfo {
+        readonly type: "hibernatableWebSocket";
+        readonly info: HibernatableWebSocketEventInfoClose | HibernatableWebSocketEventInfoError | HibernatableWebSocketEventInfoMessage;
+    }
+    interface Resume {
+        readonly type: "resume";
+        readonly attachment?: any;
+    }
+    interface CustomEventInfo {
+        readonly type: "custom";
+    }
+    interface FetchResponseInfo {
+        readonly type: "fetch";
+        readonly statusCode: number;
+    }
+    type EventOutcome = "ok" | "canceled" | "exception" | "unknown" | "killSwitch" | "daemonDown" | "exceededCpu" | "exceededMemory" | "loadShed" | "responseStreamDisconnected" | "scriptNotFound";
+    interface ScriptVersion {
+        readonly id: string;
+        readonly tag?: string;
+        readonly message?: string;
+    }
+    interface Trigger {
+        readonly traceId: string;
+        readonly invocationId: string;
+        readonly spanId: string;
+    }
+    interface Onset {
+        readonly type: "onset";
+        readonly dispatchNamespace?: string;
+        readonly entrypoint?: string;
+        readonly scriptName?: string;
+        readonly scriptTags?: string[];
+        readonly scriptVersion?: ScriptVersion;
+        readonly trigger?: Trigger;
+        readonly info: FetchEventInfo | JsRpcEventInfo | ScheduledEventInfo | AlarmEventInfo | QueueEventInfo | EmailEventInfo | TraceEventInfo | HibernatableWebSocketEventInfo | Resume | CustomEventInfo;
+    }
+    interface Outcome {
+        readonly type: "outcome";
+        readonly outcome: EventOutcome;
+        readonly cpuTime: number;
+        readonly wallTime: number;
+    }
+    interface Hibernate {
+        readonly type: "hibernate";
+    }
+    interface SpanOpen {
+        readonly type: "spanOpen";
+        readonly op?: string;
+        readonly info?: FetchEventInfo | JsRpcEventInfo | Attribute[];
+    }
+    interface SpanClose {
+        readonly type: "spanClose";
+        readonly outcome: EventOutcome;
+    }
+    interface DiagnosticChannelEvent {
+        readonly type: "diagnosticChannel";
+        readonly channel: string;
+        readonly message: any;
+    }
+    interface Exception {
+        readonly type: "exception";
+        readonly name: string;
+        readonly message: string;
+        readonly stack?: string;
+    }
+    interface Log {
+        readonly type: "log";
+        readonly level: "debug" | "error" | "info" | "log" | "warn";
+        readonly message: string;
+    }
+    interface Return {
+        readonly type: "return";
+        readonly info?: FetchResponseInfo | Attribute[];
+    }
+    interface Link {
+        readonly type: "link";
+        readonly label?: string;
+        readonly traceId: string;
+        readonly invocationId: string;
+        readonly spanId: string;
+    }
+    interface Attribute {
+        readonly type: "attribute";
+        readonly name: string;
+        readonly value: string | string[] | boolean | boolean[] | number | number[];
+    }
+    type Mark = DiagnosticChannelEvent | Exception | Log | Return | Link | Attribute[];
+    interface TailEvent {
+        readonly traceId: string;
+        readonly invocationId: string;
+        readonly spanId: string;
+        readonly timestamp: Date;
+        readonly sequence: number;
+        readonly event: Onset | Outcome | Hibernate | SpanOpen | SpanClose | Mark;
+    }
+    type TailEventHandler = (event: TailEvent) => void | Promise<void>;
+    type TailEventHandlerName = "onset" | "outcome" | "hibernate" | "spanOpen" | "spanClose" | "diagnosticChannel" | "exception" | "log" | "return" | "link" | "attribute";
+    type TailEventHandlerObject = Record<TailEventHandlerName, TailEventHandler>;
+    type TailEventHandlerType = TailEventHandler | TailEventHandlerObject;
 }
 // Copyright (c) 2022-2023 Cloudflare, Inc.
 // Licensed under the Apache 2.0 license found in the LICENSE file or at:
@@ -4621,7 +4927,7 @@ declare module "cloudflare:workflows" {
         public constructor(message: string, name?: string);
     }
 }
-declare abstract class Workflow {
+declare abstract class Workflow<PARAMS = unknown> {
     /**
      * Get a handle to an existing instance of the Workflow.
      * @param id Id for the instance of this Workflow
@@ -4633,9 +4939,9 @@ declare abstract class Workflow {
      * @param options Options when creating an instance including id and params
      * @returns A promise that resolves with a handle for the Instance
      */
-    public create(options?: WorkflowInstanceCreateOptions): Promise<WorkflowInstance>;
+    public create(options?: WorkflowInstanceCreateOptions<PARAMS>): Promise<WorkflowInstance>;
 }
-interface WorkflowInstanceCreateOptions {
+interface WorkflowInstanceCreateOptions<PARAMS = unknown> {
     /**
      * An id for your Workflow instance. Must be unique within the Workflow.
      */
@@ -4643,7 +4949,7 @@ interface WorkflowInstanceCreateOptions {
     /**
      * The event payload the Workflow instance is triggered with
      */
-    params?: unknown;
+    params?: PARAMS;
 }
 type InstanceStatus = {
     status: "queued" // means that instance is waiting to be started (see concurrency limits)

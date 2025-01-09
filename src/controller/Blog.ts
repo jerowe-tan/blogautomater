@@ -4,6 +4,7 @@ import { decryptJWT, generateJWT } from "../helpers/t2/JWT";
 import { requiredBody } from "../middlewares/Validator";
 import { MOD_CONTEXT } from "../structure/WebTypes";
 import { aiBlogTextMDGenerator, aiBlogTopicGenerator, aiGenerateKeywords, aiGenerateSummary } from "./AiFunctions/Textgeneration/TextGenerationV1";
+// import { aiBlogTextMDGenerator } from "./AiFunctions/Textgeneration/TextGenerationClaude";
 import { GoogleDrive } from "./Storage/GoogleDrive";
 
 export async function  generateBlog({env, body}:MOD_CONTEXT<0, {topic:string}>){
@@ -12,7 +13,7 @@ export async function  generateBlog({env, body}:MOD_CONTEXT<0, {topic:string}>){
       message:"Invalid Form"
     }, {status:422})
   }
-  const raw = await aiBlogTextMDGenerator(env.AI , body.topic);
+  const raw = await aiBlogTextMDGenerator(env.AI, body.topic);
   const mdTitle = checkTitleOfMdFile(raw);
   const mdSummary = await aiGenerateSummary(env.AI, raw);
   const mdKeywords = await aiGenerateKeywords(env.AI, raw);
