@@ -14,9 +14,9 @@ binding = "AI"
 # binding = "MY_KV_NAMESPACE"
 # id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
-# [[r2_buckets]]
-# binding = "MY_BUCKET"
-# bucket_name = "my-bucket"
+[[r2_buckets]]
+binding = "SUSUKO"
+bucket_name = "pinagtagpo-pero-di-tinadha"
 
 # [[d1_databases]]
 # binding = "DB"

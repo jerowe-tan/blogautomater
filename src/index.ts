@@ -1,9 +1,6 @@
 
 import { app } from "./app"
 import { Context } from "elysia";
-interface Env {
-  AI: Ai
-}
 
 
 export default {

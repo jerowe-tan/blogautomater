@@ -5,5 +5,6 @@ interface Env {
 	GOOGLE_DRIVE_CLIENT_ID: string;
 	GOOGLE_DRIVE_PRIVATE_KEY: string;
 	ANTHROPIC_API_KEY: string;
+	SUSUKO: R2Bucket;
 	AI: Ai;
 }

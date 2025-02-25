@@ -6,7 +6,9 @@
     "dev": "bun run --watch src/index.ts",
     "deploy": "wrangler deploy --minify src/index.ts",
     "wrangler-dev": "wrangler dev src/index.ts",
-    "wrangler-login": "wrangler login"
+    "wrangler-dev-online": "wrangler dev src/index.ts --remote",
+    "wrangler-login": "wrangler login",
+    "wrangler-update-types":"npx wrangler types --experimental-include-runtime"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.33.1",

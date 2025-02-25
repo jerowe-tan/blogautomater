@@ -22,3 +22,9 @@ https://developers.cloudflare.com/workers-ai/get-started/workers-wrangler/
 
 ## To Refresh Cloudflare Types
 npx wrangler types --experimental-include-runtime
+or
+npm run wrangler-update-types
+
+
+## R2 Docs
+https://developers.cloudflare.com/r2/api/workers/workers-api-usage/
