@@ -8,12 +8,12 @@
     "wrangler-dev": "wrangler dev src/index.ts",
     "wrangler-dev-online": "wrangler dev src/index.ts --remote",
     "wrangler-login": "wrangler login",
-    "wrangler-update-types":"npx wrangler types --experimental-include-runtime"
+    "wrangler-update-types": "npx wrangler types --experimental-include-runtime"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.33.1",
     "@elysiajs/bearer": "^1.1.2",
-    "@elysiajs/cors": "^1.1.1",
+    "@elysiajs/cors": "^1.2.0",
     "@elysiajs/swagger": "1.1.0",
     "elysia": "latest",
     "jose": "^5.9.6",
