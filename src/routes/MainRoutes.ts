@@ -20,7 +20,7 @@ const whiteList = [
 
 const corsMiddleware = {
   origin: (request: Request) => {
-    let headerOrigin = request.headers.get("host")
+    let headerOrigin = request.headers.get("origin")
     console.log(`CORS origin: ${headerOrigin}`);
 
     if(!headerOrigin)

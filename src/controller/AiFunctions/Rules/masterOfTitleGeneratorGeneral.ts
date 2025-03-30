@@ -17,5 +17,6 @@ export default {
   - "The Future of Logistics: How Wallet-Based Systems Simplify 3PL Bookings?"
   - "Top 5 Benefits of Using a Single Dashboard for Lalamove and Transportify?"
   - "Why cars are the best way to travel?"
+  *This is without quotations from start to end (" "is not included in the response)*
   `
 }
