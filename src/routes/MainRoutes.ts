@@ -14,6 +14,7 @@ const whiteList = [
   /.*localhost:8787$/,
   /.*localhost:4321$/,
   /.*localhost:5173$/,
+  /.*localhost:9669$/,
   /.*preview.crs-blog-content.pages.dev$/,
 ];
 
