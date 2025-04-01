@@ -16,6 +16,7 @@ const whiteList = [
   /.*localhost:5173$/,
   /.*localhost:9669$/,
   /.*preview.crs-blog-content.pages.dev$/,
+  /.*crs-blog-content.pages.dev/,
 ];
 
 const corsMiddleware = {
