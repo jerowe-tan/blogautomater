@@ -1,4 +1,4 @@
-// Runtime types generated with workerd@1.20241230.0 2024-07-31 
+// Runtime types generated with workerd@1.20250214.0 2024-07-31 
 /*! *****************************************************************************
 Copyright (c) Cloudflare. All rights reserved.
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -373,7 +373,7 @@ declare abstract class PromiseRejectionEvent extends Event {
 declare abstract class Navigator {
     sendBeacon(url: string, body?: (ReadableStream | string | (ArrayBuffer | ArrayBufferView) | Blob | FormData | URLSearchParams | URLSearchParams)): boolean;
     readonly userAgent: string;
-    readonly gpu: GPU;
+    readonly gpu?: GPU;
 }
 /**
 * The Workers runtime supports a subset of the Performance API, used to measure timing and performance,
@@ -429,6 +429,7 @@ interface DurableObjectState {
     waitUntil(promise: Promise<any>): void;
     readonly id: DurableObjectId;
     readonly storage: DurableObjectStorage;
+    container?: Container;
     blockConcurrencyWhile<T>(callback: () => Promise<T>): Promise<T>;
     acceptWebSocket(ws: WebSocket, tags?: string[]): void;
     getWebSockets(tag?: string): WebSocket[];
@@ -1163,20 +1164,20 @@ interface Element {
     hasAttribute(name: string): boolean;
     setAttribute(name: string, value: string): Element;
     removeAttribute(name: string): Element;
-    before(content: string, options?: ContentOptions): Element;
-    after(content: string, options?: ContentOptions): Element;
-    prepend(content: string, options?: ContentOptions): Element;
-    append(content: string, options?: ContentOptions): Element;
-    replace(content: string, options?: ContentOptions): Element;
+    before(content: string | ReadableStream | Response, options?: ContentOptions): Element;
+    after(content: string | ReadableStream | Response, options?: ContentOptions): Element;
+    prepend(content: string | ReadableStream | Response, options?: ContentOptions): Element;
+    append(content: string | ReadableStream | Response, options?: ContentOptions): Element;
+    replace(content: string | ReadableStream | Response, options?: ContentOptions): Element;
     remove(): Element;
     removeAndKeepContent(): Element;
-    setInnerContent(content: string, options?: ContentOptions): Element;
+    setInnerContent(content: string | ReadableStream | Response, options?: ContentOptions): Element;
     onEndTag(handler: (tag: EndTag) => void | Promise<void>): void;
 }
 interface EndTag {
     name: string;
-    before(content: string, options?: ContentOptions): EndTag;
-    after(content: string, options?: ContentOptions): EndTag;
+    before(content: string | ReadableStream | Response, options?: ContentOptions): EndTag;
+    after(content: string | ReadableStream | Response, options?: ContentOptions): EndTag;
     remove(): EndTag;
 }
 interface Comment {
@@ -1191,9 +1192,9 @@ interface Text {
     readonly text: string;
     readonly lastInTextNode: boolean;
     readonly removed: boolean;
-    before(content: string, options?: ContentOptions): Text;
-    after(content: string, options?: ContentOptions): Text;
-    replace(content: string, options?: ContentOptions): Text;
+    before(content: string | ReadableStream | Response, options?: ContentOptions): Text;
+    after(content: string | ReadableStream | Response, options?: ContentOptions): Text;
+    replace(content: string | ReadableStream | Response, options?: ContentOptions): Text;
     remove(): Text;
 }
 interface DocumentEnd {
@@ -2173,7 +2174,7 @@ declare class URLSearchParams {
     ]>;
 }
 declare class URLPattern {
-    constructor(input?: (string | URLPatternURLPatternInit), baseURL?: string, patternOptions?: URLPatternURLPatternOptions);
+    constructor(input?: (string | URLPatternURLPatternInit), baseURL?: (string | URLPatternURLPatternOptions), patternOptions?: URLPatternURLPatternOptions);
     get protocol(): string;
     get username(): string;
     get password(): string;
@@ -2900,6 +2901,18 @@ interface EventSourceEventSourceInit {
     withCredentials?: boolean;
     fetcher?: Fetcher;
 }
+interface Container {
+    get running(): boolean;
+    start(options?: ContainerStartupOptions): void;
+    monitor(): Promise<void>;
+    destroy(error?: any): Promise<void>;
+    signal(signo: number): void;
+    getTcpPort(port: number): Fetcher;
+}
+interface ContainerStartupOptions {
+    entrypoint?: string[];
+    enableInternet: boolean;
+}
 type AiImageClassificationInput = {
     image: number[];
 };
@@ -3054,7 +3067,7 @@ type AiTextGenerationInput = {
     frequency_penalty?: number;
     presence_penalty?: number;
     messages?: RoleScopedChatInput[];
-    tools?: AiTextGenerationToolInput[] | AiTextGenerationToolLegacyInput[];
+    tools?: AiTextGenerationToolInput[] | AiTextGenerationToolLegacyInput[] | (object & NonNullable<unknown>);
     functions?: AiTextGenerationFunctionsInput[];
 };
 type AiTextGenerationOutput = {
@@ -3109,12 +3122,454 @@ declare abstract class BaseAiTranslation {
     inputs: AiTranslationInput;
     postProcessedOutputs: AiTranslationOutput;
 }
-type AiOptions = {
-    gateway?: GatewayOptions;
-    prefix?: string;
-    extraHeaders?: object;
+type Ai_Cf_Openai_Whisper_Input = string | {
+    /**
+     * An array of integers that represent the audio data constrained to 8-bit unsigned integer values
+     */
+    audio: number[];
 };
-type ModelType<Name extends keyof AiModels> = AiModels[Name];
+interface Ai_Cf_Openai_Whisper_Output {
+    /**
+     * The transcription
+     */
+    text: string;
+    word_count?: number;
+    words?: {
+        word?: string;
+        /**
+         * The second this word begins in the recording
+         */
+        start?: number;
+        /**
+         * The ending second when the word completes
+         */
+        end?: number;
+    }[];
+    vtt?: string;
+}
+declare abstract class Base_Ai_Cf_Openai_Whisper {
+    inputs: Ai_Cf_Openai_Whisper_Input;
+    postProcessedOutputs: Ai_Cf_Openai_Whisper_Output;
+}
+type Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input = string | {
+    /**
+     * The input text prompt for the model to generate a response.
+     */
+    prompt?: string;
+    /**
+     * If true, a chat template is not applied and you must adhere to the specific model's expected formatting.
+     */
+    raw?: boolean;
+    /**
+     * Controls the creativity of the AI's responses by adjusting how many possible words it considers. Lower values make outputs more predictable; higher values allow for more varied and creative responses.
+     */
+    top_p?: number;
+    /**
+     * Limits the AI to choose from the top 'k' most probable words. Lower values make responses more focused; higher values introduce more variety and potential surprises.
+     */
+    top_k?: number;
+    /**
+     * Random seed for reproducibility of the generation.
+     */
+    seed?: number;
+    /**
+     * Penalty for repeated tokens; higher values discourage repetition.
+     */
+    repetition_penalty?: number;
+    /**
+     * Decreases the likelihood of the model repeating the same lines verbatim.
+     */
+    frequency_penalty?: number;
+    /**
+     * Increases the likelihood of the model introducing new topics.
+     */
+    presence_penalty?: number;
+    image: number[] | (string & NonNullable<unknown>);
+    /**
+     * The maximum number of tokens to generate in the response.
+     */
+    max_tokens?: number;
+};
+interface Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output {
+    description?: string;
+}
+declare abstract class Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M {
+    inputs: Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Input;
+    postProcessedOutputs: Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output;
+}
+type Ai_Cf_Openai_Whisper_Tiny_En_Input = string | {
+    /**
+     * An array of integers that represent the audio data constrained to 8-bit unsigned integer values
+     */
+    audio: number[];
+};
+interface Ai_Cf_Openai_Whisper_Tiny_En_Output {
+    /**
+     * The transcription
+     */
+    text: string;
+    word_count?: number;
+    words?: {
+        word?: string;
+        /**
+         * The second this word begins in the recording
+         */
+        start?: number;
+        /**
+         * The ending second when the word completes
+         */
+        end?: number;
+    }[];
+    vtt?: string;
+}
+declare abstract class Base_Ai_Cf_Openai_Whisper_Tiny_En {
+    inputs: Ai_Cf_Openai_Whisper_Tiny_En_Input;
+    postProcessedOutputs: Ai_Cf_Openai_Whisper_Tiny_En_Output;
+}
+interface Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input {
+    /**
+     * Base64 encoded value of the audio data.
+     */
+    audio: string;
+    /**
+     * Supported tasks are 'translate' or 'transcribe'.
+     */
+    task?: string;
+    /**
+     * The language of the audio being transcribed or translated.
+     */
+    language?: string;
+    /**
+     * Preprocess the audio with a voice activity detection model.
+     */
+    vad_filter?: string;
+    /**
+     * A text prompt to help provide context to the model on the contents of the audio.
+     */
+    initial_prompt?: string;
+    /**
+     * The prefix it appended the the beginning of the output of the transcription and can guide the transcription result.
+     */
+    prefix?: string;
+}
+interface Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output {
+    transcription_info?: {
+        /**
+         * The language of the audio being transcribed or translated.
+         */
+        language?: string;
+        /**
+         * The confidence level or probability of the detected language being accurate, represented as a decimal between 0 and 1.
+         */
+        language_probability?: number;
+        /**
+         * The total duration of the original audio file, in seconds.
+         */
+        duration?: number;
+        /**
+         * The duration of the audio after applying Voice Activity Detection (VAD) to remove silent or irrelevant sections, in seconds.
+         */
+        duration_after_vad?: number;
+    };
+    /**
+     * The complete transcription of the audio.
+     */
+    text: string;
+    /**
+     * The total number of words in the transcription.
+     */
+    word_count?: number;
+    segments?: {
+        /**
+         * The starting time of the segment within the audio, in seconds.
+         */
+        start?: number;
+        /**
+         * The ending time of the segment within the audio, in seconds.
+         */
+        end?: number;
+        /**
+         * The transcription of the segment.
+         */
+        text?: string;
+        /**
+         * The temperature used in the decoding process, controlling randomness in predictions. Lower values result in more deterministic outputs.
+         */
+        temperature?: number;
+        /**
+         * The average log probability of the predictions for the words in this segment, indicating overall confidence.
+         */
+        avg_logprob?: number;
+        /**
+         * The compression ratio of the input to the output, measuring how much the text was compressed during the transcription process.
+         */
+        compression_ratio?: number;
+        /**
+         * The probability that the segment contains no speech, represented as a decimal between 0 and 1.
+         */
+        no_speech_prob?: number;
+        words?: {
+            /**
+             * The individual word transcribed from the audio.
+             */
+            word?: string;
+            /**
+             * The starting time of the word within the audio, in seconds.
+             */
+            start?: number;
+            /**
+             * The ending time of the word within the audio, in seconds.
+             */
+            end?: number;
+        }[];
+    };
+    /**
+     * The transcription in WebVTT format, which includes timing and text information for use in subtitles.
+     */
+    vtt?: string;
+}
+declare abstract class Base_Ai_Cf_Openai_Whisper_Large_V3_Turbo {
+    inputs: Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input;
+    postProcessedOutputs: Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output;
+}
+interface Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input {
+    /**
+     * A text description of the image you want to generate.
+     */
+    prompt: string;
+    /**
+     * The number of diffusion steps; higher values can improve quality but take longer.
+     */
+    steps?: number;
+}
+interface Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output {
+    /**
+     * The generated image in Base64 format.
+     */
+    image?: string;
+}
+declare abstract class Base_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell {
+    inputs: Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input;
+    postProcessedOutputs: Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output;
+}
+type Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input = Prompt | Messages;
+interface Prompt {
+    /**
+     * The input text prompt for the model to generate a response.
+     */
+    prompt: string;
+    image?: number[] | (string & NonNullable<unknown>);
+    /**
+     * If true, a chat template is not applied and you must adhere to the specific model's expected formatting.
+     */
+    raw?: boolean;
+    /**
+     * If true, the response will be streamed back incrementally using SSE, Server Sent Events.
+     */
+    stream?: boolean;
+    /**
+     * The maximum number of tokens to generate in the response.
+     */
+    max_tokens?: number;
+    /**
+     * Controls the randomness of the output; higher values produce more random results.
+     */
+    temperature?: number;
+    /**
+     * Adjusts the creativity of the AI's responses by controlling how many possible words it considers. Lower values make outputs more predictable; higher values allow for more varied and creative responses.
+     */
+    top_p?: number;
+    /**
+     * Limits the AI to choose from the top 'k' most probable words. Lower values make responses more focused; higher values introduce more variety and potential surprises.
+     */
+    top_k?: number;
+    /**
+     * Random seed for reproducibility of the generation.
+     */
+    seed?: number;
+    /**
+     * Penalty for repeated tokens; higher values discourage repetition.
+     */
+    repetition_penalty?: number;
+    /**
+     * Decreases the likelihood of the model repeating the same lines verbatim.
+     */
+    frequency_penalty?: number;
+    /**
+     * Increases the likelihood of the model introducing new topics.
+     */
+    presence_penalty?: number;
+    /**
+     * Name of the LoRA (Low-Rank Adaptation) model to fine-tune the base model.
+     */
+    lora?: string;
+}
+interface Messages {
+    /**
+     * An array of message objects representing the conversation history.
+     */
+    messages: {
+        /**
+         * The role of the message sender (e.g., 'user', 'assistant', 'system', 'tool').
+         */
+        role: string;
+        /**
+         * The content of the message as a string.
+         */
+        content: string;
+    }[];
+    image?: number[] | string;
+    functions?: {
+        name: string;
+        code: string;
+    }[];
+    /**
+     * A list of tools available for the assistant to use.
+     */
+    tools?: ({
+        /**
+         * The name of the tool. More descriptive the better.
+         */
+        name: string;
+        /**
+         * A brief description of what the tool does.
+         */
+        description: string;
+        /**
+         * Schema defining the parameters accepted by the tool.
+         */
+        parameters: {
+            /**
+             * The type of the parameters object (usually 'object').
+             */
+            type: string;
+            /**
+             * List of required parameter names.
+             */
+            required?: string[];
+            /**
+             * Definitions of each parameter.
+             */
+            properties: {
+                [k: string]: {
+                    /**
+                     * The data type of the parameter.
+                     */
+                    type: string;
+                    /**
+                     * A description of the expected parameter.
+                     */
+                    description: string;
+                };
+            };
+        };
+    } | {
+        /**
+         * Specifies the type of tool (e.g., 'function').
+         */
+        type: string;
+        /**
+         * Details of the function tool.
+         */
+        function: {
+            /**
+             * The name of the function.
+             */
+            name: string;
+            /**
+             * A brief description of what the function does.
+             */
+            description: string;
+            /**
+             * Schema defining the parameters accepted by the function.
+             */
+            parameters: {
+                /**
+                 * The type of the parameters object (usually 'object').
+                 */
+                type: string;
+                /**
+                 * List of required parameter names.
+                 */
+                required?: string[];
+                /**
+                 * Definitions of each parameter.
+                 */
+                properties: {
+                    [k: string]: {
+                        /**
+                         * The data type of the parameter.
+                         */
+                        type: string;
+                        /**
+                         * A description of the expected parameter.
+                         */
+                        description: string;
+                    };
+                };
+            };
+        };
+    })[];
+    /**
+     * If true, the response will be streamed back incrementally.
+     */
+    stream?: boolean;
+    /**
+     * The maximum number of tokens to generate in the response.
+     */
+    max_tokens?: number;
+    /**
+     * Controls the randomness of the output; higher values produce more random results.
+     */
+    temperature?: number;
+    /**
+     * Controls the creativity of the AI's responses by adjusting how many possible words it considers. Lower values make outputs more predictable; higher values allow for more varied and creative responses.
+     */
+    top_p?: number;
+    /**
+     * Limits the AI to choose from the top 'k' most probable words. Lower values make responses more focused; higher values introduce more variety and potential surprises.
+     */
+    top_k?: number;
+    /**
+     * Random seed for reproducibility of the generation.
+     */
+    seed?: number;
+    /**
+     * Penalty for repeated tokens; higher values discourage repetition.
+     */
+    repetition_penalty?: number;
+    /**
+     * Decreases the likelihood of the model repeating the same lines verbatim.
+     */
+    frequency_penalty?: number;
+    /**
+     * Increases the likelihood of the model introducing new topics.
+     */
+    presence_penalty?: number;
+}
+type Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output = {
+    /**
+     * The generated text response from the model
+     */
+    response?: string;
+    /**
+     * An array of tool calls requests made during the response generation
+     */
+    tool_calls?: {
+        /**
+         * The arguments passed to be passed to the tool call request
+         */
+        arguments?: object;
+        /**
+         * The name of the tool to be called
+         */
+        name?: string;
+    }[];
+} | ReadableStream;
+declare abstract class Base_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct {
+    inputs: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Input;
+    postProcessedOutputs: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output;
+}
 interface AiModels {
     "@cf/huggingface/distilbert-sst-2-int8": BaseAiTextClassification;
     "@cf/stabilityai/stable-diffusion-xl-base-1.0": BaseAiTextToImage;
@@ -3167,16 +3622,60 @@ interface AiModels {
     "@cf/meta/llama-3.2-3b-instruct": BaseAiTextGeneration;
     "@cf/meta/llama-3.2-1b-instruct": BaseAiTextGeneration;
     "@cf/meta/llama-3.3-70b-instruct-fp8-fast": BaseAiTextGeneration;
+    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": BaseAiTextGeneration;
     "@cf/meta/m2m100-1.2b": BaseAiTranslation;
     "@cf/facebook/bart-large-cnn": BaseAiSummarization;
-    "@cf/unum/uform-gen2-qwen-500m": BaseAiImageToText;
     "@cf/llava-hf/llava-1.5-7b-hf": BaseAiImageToText;
+    "@cf/openai/whisper": Base_Ai_Cf_Openai_Whisper;
+    "@cf/unum/uform-gen2-qwen-500m": Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M;
+    "@cf/openai/whisper-tiny-en": Base_Ai_Cf_Openai_Whisper_Tiny_En;
+    "@cf/openai/whisper-large-v3-turbo": Base_Ai_Cf_Openai_Whisper_Large_V3_Turbo;
+    "@cf/black-forest-labs/flux-1-schnell": Base_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell;
+    "@cf/meta/llama-3.2-11b-vision-instruct": Base_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct;
 }
-type ModelListType = Record<string, any>;
-declare abstract class Ai<ModelList extends ModelListType = AiModels> {
+type AiOptions = {
+    gateway?: GatewayOptions;
+    returnRawResponse?: boolean;
+    prefix?: string;
+    extraHeaders?: object;
+};
+type AiModelsSearchParams = {
+    author?: string;
+    hide_experimental?: boolean;
+    page?: number;
+    per_page?: number;
+    search?: string;
+    source?: number;
+    task?: string;
+};
+type AiModelsSearchObject = {
+    id: string;
+    source: number;
+    name: string;
+    description: string;
+    task: {
+        id: string;
+        name: string;
+        description: string;
+    };
+    tags: string[];
+    properties: {
+        property_id: string;
+        value: string;
+    }[];
+};
+interface InferenceUpstreamError extends Error {
+}
+interface AiInternalError extends Error {
+}
+type AiModelListType = Record<string, any>;
+declare abstract class Ai<AiModelList extends AiModelListType = AiModels> {
     aiGatewayLogId: string | null;
     gateway(gatewayId: string): AiGateway;
-    run<Name extends keyof ModelList>(model: Name, inputs: ModelList[Name]["inputs"], options?: AiOptions): Promise<ModelList[Name]["postProcessedOutputs"]>;
+    run<Name extends keyof AiModelList, Options extends AiOptions>(model: Name, inputs: AiModelList[Name]["inputs"], options?: Options): Promise<Options extends {
+        returnRawResponse: true;
+    } ? Response : AiModelList[Name]["postProcessedOutputs"]>;
+    public models(params?: AiModelsSearchParams): Promise<AiModelsSearchObject[]>;
 }
 type GatewayOptions = {
     id: string;
@@ -4163,6 +4662,14 @@ type ImageTransform = {
     };
     zoom?: number;
 };
+type ImageDrawOptions = {
+    opacity?: number;
+    repeat?: boolean | string;
+    top?: number;
+    left?: number;
+    bottom?: number;
+    right?: number;
+};
 type ImageOutputOptions = {
     format: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' | 'image/avif' | 'rgb' | 'rgba';
     quality?: number;
@@ -4185,10 +4692,17 @@ interface ImagesBinding {
 interface ImageTransformer {
     /**
      * Apply transform next, returning a transform handle.
-     * You can then apply more transformations or retrieve the output.
+     * You can then apply more transformations, draw, or retrieve the output.
      * @param transform
      */
     transform(transform: ImageTransform): ImageTransformer;
+    /**
+     * Draw an image on this transformer, returning a transform handle.
+     * You can then apply more transformations, draw, or retrieve the output.
+     * @param image The image (or transformer that will give the image) to draw
+     * @param options The options configuring how to draw the image
+     */
+    draw(image: ReadableStream<Uint8Array> | ImageTransformer, options?: ImageDrawOptions): ImageTransformer;
     /**
      * Retrieve the image that results from applying the transforms to the
      * provided input
@@ -4480,6 +4994,7 @@ declare module "cloudflare:workers" {
         [Rpc.__WORKFLOW_ENTRYPOINT_BRAND]: never;
         protected ctx: ExecutionContext;
         protected env: Env;
+        constructor(ctx: ExecutionContext, env: Env);
         run(event: Readonly<WorkflowEvent<T>>, step: WorkflowStep): Promise<unknown>;
     }
 }
