@@ -14,6 +14,8 @@ const whiteList = [
   /.*\.preview\.toyotacarrental-alpha\.pages\.dev$/,
   /.*\.toyotacarrental-alpha\.pages\.dev$/,
   /.*\.toyotacarrental\.com\.ph$/,
+  /.*\.toyotacarrental\.com$/,
+  /.*\.toyotacarrental$/,
   /.*127.0.0.1:8787$/,
   /.*localhost:8787$/,
   /.*localhost:4321$/,
